@@ -20,4 +20,3 @@ if __name__ == "__main__":
         errors.append(abs(test - validation_result[y][0]))
     print(np.average(errors))
     dump(vector_machine, 'svm.joblib')
-

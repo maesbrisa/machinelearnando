@@ -3,35 +3,17 @@ import re
 
 import numpy as np
 
+from utils import parse_raw_message, word_counter
+
 with open('keywords.txt', 'r') as f:
     keywords = [aux.strip() for aux in f.readlines()]
-
-
-def parse_raw_message(raw_message):
-    lines = raw_message.split('\n')
-    email = {}
-    message = ''
-    keys_to_extract = ['from', 'to']
-    for line in lines:
-        if ':' not in line:
-            message += line.strip()
-            email['body'] = message
-        else:
-            pairs = line.split(':')
-            key = pairs[0].lower()
-            val = pairs[1].strip()
-            if key in keys_to_extract:
-                email[key] = val
-    return email
 
 
 def get_feature_vectors(body, from_mail, flag):
     if len(body) == 0:
         return None
     counters = np.zeros(len(keywords)+2)
-    for i, word in enumerate(keywords):
-        counters[i] = body.count(word)
-    np.divide(counters, len(body))
+    counters = word_counter(body, counters)
     counters[-2] = len(from_mail)
     counters[-1] = flag
     return counters
