@@ -27,9 +27,7 @@ def get_feature_vectors(body):
     counters = np.zeros(len(keywords))
     for i, word in enumerate(keywords):
         counters[i] = body.count(word)
-    if np.any(counters):
-        return np.divide(counters, len(body)), 1
-    return None, None
+    return np.divide(counters, len(body)), 1
 
 
 if __name__ == "__main__":
@@ -44,9 +42,8 @@ if __name__ == "__main__":
         raw_message = parse_raw_message('from:' + x.lower()).get('body')
         if raw_message is not None:
             vector, result = get_feature_vectors(raw_message)
-            if vector is not None:
-                samples_array.append(vector)
-                values_array.append(result)
+            samples_array.append(vector)
+            values_array.append(result)
 
     print(len(values_array))
     with open('./vectors.txt', 'w') as f:
