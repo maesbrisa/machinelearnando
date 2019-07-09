@@ -1,7 +1,7 @@
 import numpy as np
+import os
 
-
-with open('palabras_clave_low.txt', 'r') as f:
+with open('keywords.txt', 'r') as f:
     keywords = [aux.strip() for aux in f.readlines()]
 
 
@@ -23,29 +23,37 @@ def parse_raw_message(raw_message):
     return email
 
 
-def get_feature_vectors(body):
-    counters = np.zeros(len(keywords))
+def get_feature_vectors(from_mail, body):
+    if len(body) == 0:
+        return None, None
+    counters = np.zeros(len(keywords)+1)
     for i, word in enumerate(keywords):
         counters[i] = body.count(word)
-    return np.divide(counters, len(body)), 1
+    counters[-1] = len(from_mail)
+    return np.divide(counters, len(body))
 
 
 if __name__ == "__main__":
-    path = './bad.txt'
-    with open(path, mode='r', errors='ignore') as f:
-        mail_list = f.read().split('From')
-
     samples_array = []
     values_array = []
+    for root, dirs, files in os.walk('./mails', topdown=False):
+        for name in files:
+            if 'bad' in name:
+                phishing = True
+            else:
+                phishing = False
 
-    for i, x in enumerate(mail_list):
-        raw_message = parse_raw_message('from:' + x.lower()).get('body')
-        if raw_message is not None:
-            vector, result = get_feature_vectors(raw_message)
-            samples_array.append(vector)
-            values_array.append(result)
+            with open(os.path.join(root, name), mode='r', errors='ignore') as f:
+                mail_list = f.read().split('From')
 
-    print(len(values_array))
+            for i, x in enumerate(mail_list):
+                raw_dict = parse_raw_message('from:' + x.lower())
+                if raw_dict.get('body') is not None:
+                    vector = get_feature_vectors(raw_dict['from'], raw_dict['body'])
+                    if vector is not None:
+                        samples_array.append(vector)
+                        values_array.append(int(phishing))
+
     with open('./vectors.txt', 'w') as f:
         print(np.array(samples_array), file=f)
     with open('./results.txt', 'w') as f:
