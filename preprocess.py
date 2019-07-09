@@ -23,14 +23,16 @@ def parse_raw_message(raw_message):
     return email
 
 
-def get_feature_vectors(from_mail, body):
+def get_feature_vectors(body, from_mail, flag):
     if len(body) == 0:
-        return None, None
-    counters = np.zeros(len(keywords)+1)
+        return None
+    counters = np.zeros(len(keywords)+2)
     for i, word in enumerate(keywords):
         counters[i] = body.count(word)
-    counters[-1] = len(from_mail)
-    return np.divide(counters, len(body))
+    np.divide(counters, len(body))
+    counters[-2] = len(from_mail)
+    counters[-1] = flag
+    return counters
 
 
 if __name__ == "__main__":
@@ -39,9 +41,9 @@ if __name__ == "__main__":
     for root, dirs, files in os.walk('./mails', topdown=False):
         for name in files:
             if 'bad' in name:
-                phishing = True
+                phishing = 1
             else:
-                phishing = False
+                phishing = 0
 
             with open(os.path.join(root, name), mode='r', errors='ignore') as f:
                 mail_list = f.read().split('From')
@@ -49,12 +51,8 @@ if __name__ == "__main__":
             for i, x in enumerate(mail_list):
                 raw_dict = parse_raw_message('from:' + x.lower())
                 if raw_dict.get('body') is not None:
-                    vector = get_feature_vectors(raw_dict['from'], raw_dict['body'])
+                    vector = get_feature_vectors(raw_dict['body'], raw_dict['from'], phishing)
                     if vector is not None:
                         samples_array.append(vector)
-                        values_array.append(int(phishing))
 
-    with open('./vectors.txt', 'w') as f:
-        print(np.array(samples_array), file=f)
-    with open('./results.txt', 'w') as f:
-        print(np.array(values_array), file=f)
+    np.save('vectors', np.random.shuffle(np.array(samples_array)))
