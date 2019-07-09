@@ -1,5 +1,7 @@
-import numpy as np
 import os
+import re
+
+import numpy as np
 
 with open('keywords.txt', 'r') as f:
     keywords = [aux.strip() for aux in f.readlines()]
@@ -46,7 +48,7 @@ if __name__ == "__main__":
                 phishing = 0
 
             with open(os.path.join(root, name), mode='r', errors='ignore') as f:
-                mail_list = f.read().split('From')
+                mail_list = re.compile('\nFrom:').split(f.read())
 
             for i, x in enumerate(mail_list):
                 raw_dict = parse_raw_message('from:' + x.lower())
@@ -54,5 +56,6 @@ if __name__ == "__main__":
                     vector = get_feature_vectors(raw_dict['body'], raw_dict['from'], phishing)
                     if vector is not None:
                         samples_array.append(vector)
-
-    np.save('vectors', np.random.shuffle(np.array(samples_array)))
+    samples = np.array(samples_array)
+    np.random.shuffle(samples)
+    np.save('vectors', samples)
