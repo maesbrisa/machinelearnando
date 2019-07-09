@@ -58,4 +58,4 @@ if __name__ == "__main__":
                         samples_array.append(vector)
     samples = np.array(samples_array)
     np.random.shuffle(samples)
-    np.save('vectors', samples)
+    np.save('input', samples)
