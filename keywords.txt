@@ -25,7 +25,9 @@ financial
 free
 healthcare
 immediately
+improvement
 info
+infected
 insurance
 internet
 invoice
@@ -59,4 +61,5 @@ ups
 urgent
 usps
 vacation
+virus
 win
