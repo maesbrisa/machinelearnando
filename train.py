@@ -11,7 +11,7 @@ if __name__ == "__main__":
     [sample_train, validation_train] = np.vsplit(samples, [6000])
     [sample_result, validation_result] = np.vsplit(results, [6000])
 
-    vector_machine = svm.SVC(kernel='linear')
+    vector_machine = svm.SVC(probability=True, kernel='linear')
     vector_machine.fit(sample_train, sample_result.ravel())
 
     errors = []

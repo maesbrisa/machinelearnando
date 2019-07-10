@@ -7,6 +7,7 @@ import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--file', '-f', required=True, help='File to check')
+parser.add_argument('--dir', '-d', help="Directory with files to check")
 args = parser.parse_args()
 
 with open('keywords.txt', 'r') as f:
@@ -37,7 +38,9 @@ if __name__ == "__main__":
     # np.save('input', samples)
     svm_trained = joblib.load('svm.joblib')
     output = []
+    print("Not phising (%) | Phising (%)")
     for s in samples:
-        r = svm_trained.predict(s.reshape(1, -1))[0]
+        r = svm_trained.predict_proba(s.reshape(1, -1))
         output.append(r)
         print(r)
+
